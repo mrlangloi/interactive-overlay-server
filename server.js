@@ -4,7 +4,7 @@ const http = require('http');
 const socketIO = require('socket.io');
 const cors = require('cors');
 const mongoose = require('mongoose');
-const Image = require('./models/images.js');
+const Image = require('./models/image.js');
 
 const app = express();
 const server = http.createServer(app);
@@ -18,23 +18,18 @@ app.use(cors({
   origin: "http://localhost:3000", // restrict calls to those this address
 }));
 
+app.use('/images', require('./routes/images.js'));
+app.use(express.json());
+app.use(express.urlencoded({extended: false}));
+
+
+
 /**
  * TODO
  * - I'm able to get the image data from mongoDB
  * - Now I need to find a way to simultaneously update the positional data across all clients
  * - find a way to rotate images
  */
-
-
-// Get all images from mongoDB
-app.get('/images', async (req, res) => {
-  try {
-    const images = await Image.find();
-    res.json(images);
-  } catch (error) {
-    console.error(error);
-  }
-});
 
 // Connect to MongoDB
 mongoose.connect(`${process.env.MONGO_URI}`, {
@@ -86,7 +81,7 @@ connection.once('open', () => {
       io.emit('deletedImage', change.documentKey.key);
     }
   });
-  
+
 });
 
 // Socket.io connection
@@ -115,6 +110,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('updateImage', (data) => {
+    console.log(data);
     socket.broadcast.emit('updatedImage', data);
   });
 
@@ -125,5 +121,5 @@ io.on('connection', (socket) => {
 });
 
 server.listen(`${process.env.PORT}`, () => {
-  console.log(`listening on *:${process.env.PORT}`);
+  console.log(`Listening on port ${process.env.PORT}`);
 });
