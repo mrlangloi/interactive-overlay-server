@@ -104,7 +104,8 @@ connection.once('open', () => {
 
 // Socket.io connection
 io.on('connection', (socket) => {
-  console.log(`User ${socket.id} connected`);
+  const userIP = socket.handshake.address;
+  console.log(`IP ${userIP.replace('::ffff:', '')} connected`);
 
   // Handle when a client sends a message
   socket.on('message', message => {
@@ -127,14 +128,14 @@ io.on('connection', (socket) => {
   //   }
   // });
 
-  // socket.on('updateImage', (data) => {
-  //   console.log(data);
-  //   socket.broadcast.emit('updatedImage', data);
-  // });
+  socket.on('updateImage', (data) => {
+    console.log(data);
+    socket.broadcast.emit('updatedImage', data);
+  });
 
   // Handle when a client disconnects
   socket.on('disconnect', () => {
-    console.log(`User ${socket.id} disconnected.`);
+    console.log(`IP ${userIP.replace('::ffff:', '')} connected`);
   });
 });
 
