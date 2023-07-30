@@ -30,6 +30,9 @@ app.use('/images', imageRoutes);
  * - add support for text
  * - add opacity slider??
  * - dump mongoDB collection every midnight
+ * - there is a slight hitch (event processing delay) on the initial 
+ * move when trying to move an image that has a big file size, 
+ * I am considering using web workers to handle interactjs events
  */
 
 // Connect to MongoDB
@@ -65,6 +68,7 @@ connection.once('open', () => {
         width: change.fullDocument.width,
         height: change.fullDocument.height,
         rotation: change.fullDocument.rotation,
+        zIndex: change.fullDocument.zIndex,
         opacity: change.fullDocument.opacity,
       };
       io.emit('newImage', image);
@@ -79,6 +83,7 @@ connection.once('open', () => {
         width: change.updateDescription.updatedFields.width,
         height: change.updateDescription.updatedFields.height,
         rotation: change.updateDescription.updatedFields.rotation,
+        zIndex: change.updateDescription.updatedFields.zIndex,
         opacity: change.updateDescription.updatedFields.opacity,
       };
       await connection.collection('images').findOneAndUpdate({
@@ -92,6 +97,7 @@ connection.once('open', () => {
           width: image.width,
           height: image.height,
           rotation: image.rotation,
+          zIndex: image.zIndex,
           opacity: image.opacity
         }
       });
@@ -115,21 +121,6 @@ io.on('connection', (socket) => {
     console.log(message);
     io.emit('message', message);
   })
-
-  // socket.on('uploadImage', (data) => {
-  //   try {
-  //     // Store the image data in MongoDB
-  //     const image = new Image({ key: data.key, imageData: data.imageData, x: data.x, y: data.y, width: data.width, height: data.height, rotation: data.rotation, opacity: data.opacity });
-  //     image.save().then( () => {
-  //       // // Broadcast the image data to all connected clients
-  //       console.log(data);
-  //       socket.broadcast.emit('newImage', data);
-  //       console.log('Image saved to MongoDB');
-  //     });
-  //   } catch (error) {
-  //     console.error('Error saving image:', error);
-  //   }
-  // });
 
   socket.on('updateImage', (data) => {
     console.log(data);
