@@ -2,7 +2,8 @@ const Image = require('../models/image');
 
 const addImage = async (req, res) => {
   try {
-    const image = new Image(req.body);
+    console.log(`Body: ${req.body}`);
+    const image = await Image.create(req.body);
     await image.save();
     res.status(201).json(image);
   }
@@ -23,8 +24,9 @@ const getAllImages = async (req, res) => {
 
 const deleteImage = async (req, res) => {
   try {
-    const { id } = req.params;
-    const deleted = await Image.findByIdAndDelete(id);
+    console.log(`Params: ${req.params.id}`);
+    const id = req.params.id;
+    const deleted = await Image.find({ key: id }).deleteOne();
     if (deleted) {
       return res.status(200).send("Image deleted");
     }
@@ -35,8 +37,22 @@ const deleteImage = async (req, res) => {
   }
 };
 
+const updateImage = async (req, res) => {
+  try {
+    const { id } = req.params.id;
+    const updatedValues = req.body;
+    await axios.put(`http://localhost:3000/images/${id}`, updatedValues);
+    res.status(200).send("Image updated");
+  }
+  catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+
 module.exports = {
   addImage,
   getAllImages,
-  deleteImage
+  deleteImage,
+  updateImage,
 };
