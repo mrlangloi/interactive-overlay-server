@@ -24,9 +24,12 @@ app.use('/images', imageRoutes);
 
 /**
  * TODO
- * - I'm able to get the image data from mongoDB
- * - Now I need to find a way to simultaneously update the positional data across all clients
- * - find a way to rotate images
+ * - change z-index of images upon - or = keypress
+ * - update the translate and rotate values in mongoDB when the image is moved or rotated
+ * - have app hosted on Render
+ * - add support for text
+ * - add opacity slider??
+ * - dump mongoDB collection every midnight
  */
 
 // Connect to MongoDB
