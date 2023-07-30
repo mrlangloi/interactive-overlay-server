@@ -130,12 +130,12 @@ io.on('connection', (socket) => {
 
   socket.on('updateImage', (data) => {
     console.log(data);
-    socket.broadcast.emit('updatedImage', data);
+    io.emit('updatedImage', data);
   });
 
   // Handle when a client disconnects
   socket.on('disconnect', () => {
-    console.log(`IP ${userIP.replace('::ffff:', '')} connected`);
+    console.log(`IP ${userIP.replace('::ffff:', '')} disconnected`);
   });
 });
 
