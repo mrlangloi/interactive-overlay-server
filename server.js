@@ -33,6 +33,12 @@ app.use('/images', imageRoutes);
  * - there is a slight hitch (event processing delay) on the initial 
  * move when trying to move an image that has a big file size, 
  * I am considering using web workers to handle interactjs events
+ * Or I could look into using GridFS to compress the images
+ * 
+ * Bugs
+ * - upon deleting an image that precedes other uploaded images, the image 
+ * of the following index snaps to the position of the deleted image and
+ * takes on ALL of its properties
  */
 
 // Connect to MongoDB
