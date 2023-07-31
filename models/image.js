@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const imageSchema = new mongoose.Schema({
-  key: String,
+  imageID: String,
   imageData: String,
   createdAt: { type: Date, default: Date.now },
   x: Number,
@@ -9,6 +9,7 @@ const imageSchema = new mongoose.Schema({
   width: Number,
   height: Number,
   rotation: Number,
+  zIndex: Number,
   opacity: Number,
 });
 
