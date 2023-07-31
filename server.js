@@ -45,72 +45,6 @@ mongoose.connect(`${process.env.MONGO_URI}`, {
   console.log(err);
 });
 
-const connection = mongoose.connection;
-
-connection.once('open', () => {
-  const imagesChangeStream = connection.collection('images').watch();
-
-  console.log('MongoDB database connection established successfully');
-
-  imagesChangeStream.on('change', async (change) => {
-
-    console.log(`Change detected: ${change.operationType}`);
-
-    console.log(change);
-
-    if (change.operationType === 'insert') {
-      const image = {
-        _id: change.fullDocument._id,
-        key: change.fullDocument.key,
-        imageData: change.fullDocument.imageData,
-        x: change.fullDocument.x,
-        y: change.fullDocument.y,
-        width: change.fullDocument.width,
-        height: change.fullDocument.height,
-        rotation: change.fullDocument.rotation,
-        zIndex: change.fullDocument.zIndex,
-        opacity: change.fullDocument.opacity,
-      };
-      io.emit('newImage', image);
-    }
-    else if (change.operationType === 'update') {
-      const image = {
-        _id: change.documentKey._id,
-        key: change.updateDescription.updatedFields.key,
-        imageData: change.updateDescription.updatedFields.imageData,
-        x: change.updateDescription.updatedFields.x,
-        y: change.updateDescription.updatedFields.y,
-        width: change.updateDescription.updatedFields.width,
-        height: change.updateDescription.updatedFields.height,
-        rotation: change.updateDescription.updatedFields.rotation,
-        zIndex: change.updateDescription.updatedFields.zIndex,
-        opacity: change.updateDescription.updatedFields.opacity,
-      };
-      await connection.collection('images').findOneAndUpdate({
-        _id: image._id
-      }, {
-        $set: {
-          key: image.key,
-          imageData: image.imageData,
-          x: image.x,
-          y: image.y,
-          width: image.width,
-          height: image.height,
-          rotation: image.rotation,
-          zIndex: image.zIndex,
-          opacity: image.opacity
-        }
-      });
-      io.emit('updatedImage', image);
-    }
-    else if (change.operationType === 'delete') {
-      console.log(`Deleting image: ${change.documentKey._id}`);
-      io.emit('deletedImage', change.documentKey._id);
-    }
-  }
-  );
-});
-
 // Socket.io connection
 io.on('connection', (socket) => {
   const userIP = socket.handshake.address;
@@ -122,9 +56,18 @@ io.on('connection', (socket) => {
     io.emit('message', message);
   })
 
+  socket.on('uploadImage', (data) => {
+    console.log('Uploading: ' + data);
+    io.emit('uploadedImage', data);
+  });
+
   socket.on('updateImage', (data) => {
-    console.log(data);
     io.emit('updatedImage', data);
+  });
+
+  socket.on('deleteImage', (data) => {
+    console.log('Deleting: ' + data);
+    io.emit('deletedImage', data);
   });
 
   // Handle when a client disconnects
