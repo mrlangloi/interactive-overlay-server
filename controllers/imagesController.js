@@ -5,7 +5,8 @@ const util = require('util');
 
 const addImage = async (req, res) => {
   try {
-    console.log('Body: ' + req.body);
+    console.log('Body: ');
+    console.log(util.inspect(req.body, false, null, true /* enable colors */));
     const image = await Image.create(req.body);
     await image.save();
     res.status(201).json(image);
@@ -17,7 +18,7 @@ const addImage = async (req, res) => {
 
 const getAllImages = async (req, res) => {
   try {
-    const images = await Image.find();
+    const images = await Image.find({}).sort({ createdAt: 1});
     res.status(200).json(images);
   }
   catch (error) {
@@ -29,12 +30,10 @@ const deleteImage = async (req, res) => {
   try {
     console.log(util.inspect(req.params, false, null, true /* enable colors */));
     const imageID = req.params.id;
-    const deleted = await Image.find({ imageID: imageID }).deleteOne();
+    const deleted = await Image.findOneAndDelete({ imageID: imageID });
     if (deleted) {
       return res.status(200).send("Image deleted");
-
     }
-    throw new Error("Image not found");
   }
   catch (error) {
     res.status(400).json({ error: error.message });
@@ -52,7 +51,6 @@ const updateImage = async (req, res) => {
     if (updated) {
       return res.status(200).send("Image updated");
     }
-    throw new Error("Image not found");
   }
   catch (error) {
     res.status(400).json({ error: error.message });
