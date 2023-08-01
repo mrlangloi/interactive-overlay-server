@@ -10,6 +10,8 @@ const imageSchema = new mongoose.Schema({
   height: Number,
   rotation: Number,
   zIndex: Number,
+  scaleX: Number,
+  scaleY: Number,
   opacity: Number,
 });
 
