@@ -5,7 +5,7 @@ const util = require('util');
 
 const addImage = async (req, res) => {
   try {
-    console.log('Body: ');
+    console.log('Upload body: ');
     console.log(util.inspect(req.body, false, null, true /* enable colors */));
     const image = await Image.create(req.body);
     await image.save();
@@ -45,8 +45,8 @@ const updateImage = async (req, res) => {
   try {
     const ID = req.params.id;
     const updatedValues = req.body;
-    console.log("Request body : ");
-    console.log(util.inspect(updatedValues, false, null, true /* enable colors */));
+    // console.log("Request body : ");
+    // console.log(util.inspect(updatedValues, false, null, true /* enable colors */));
     const updated = await Image.findOneAndUpdate({ imageID: ID }, updatedValues);
     if (updated) {
       return res.status(200).send("Image updated");
